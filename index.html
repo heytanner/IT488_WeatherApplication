@@ -20,15 +20,17 @@
 
   <div class="mx-auto max-w-5xl px-4 py-6">
     <!-- header -->
-    <header class="flex items-center justify-between gap-3">
-      <h1 class="text-2xl sm:text-3xl font-semibold text-shadow flex items-center gap-3">
-        <img src="weatherloop-logo.png" alt="Weather Loop logo" class="h-9 w-auto" onerror="this.style.display='none'"/>
-        <span>Weather Loop</span>
-      </h1>
-      <div class="flex items-center gap-2">
-        <button id="unitBtn" class="glass rounded-2xl px-3 py-2 text-sm">°F</button>
-        <button id="themeBtn" class="glass rounded-2xl px-3 py-2 text-sm">Theme</button>
-      </div>
+    <header class="flex flex-col items-center gap-4">
+  <img src="breezy-logo.png" alt="Breezy logo"
+       class="h-24 w-auto select-none"
+       onerror="this.style.display='none'"/>
+
+  <div class="flex items-center gap-2">
+    <button id="unitBtn" class="glass hover:bg-white/25 active:scale-95 transition rounded-2xl px-3 py-2 text-sm">°F</button>
+    <button id="themeBtn" class="glass hover:bg-white/25 active:scale-95 transition rounded-2xl px-3 py-2 text-sm">Theme</button>
+    <a href="#about" class="glass hover:bg-white/25 rounded-2xl px-3 py-2 text-sm">About</a>
+  </div>
+
     </header>
 
     <!-- search -->
