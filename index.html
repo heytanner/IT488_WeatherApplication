@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weather Loop</title>
+  <link rel="icon" type="image/png" href="weatherloop-favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glass{background:rgba(255,255,255,.14);}
+    .glass-dark{background:rgba(0,0,0,.22);}
+    .text-shadow{ text-shadow: 0 2px 12px rgba(0,0,0,.45) }
+    .hide-scroll::-webkit-scrollbar{ display:none }
+    .hide-scroll{ -ms-overflow-style:none; scrollbar-width:none }
+  </style>
+</head>
+<body class="min-h-screen text-white font-sans selection:bg-white/20">
+  <!-- background -->
+  <div class="fixed inset-0 -z-10 bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700"></div>
+
+  <div class="mx-auto max-w-5xl px-4 py-6">
+    <!-- header -->
+    <header class="flex items-center justify-between gap-3">
+      <h1 class="text-2xl sm:text-3xl font-semibold text-shadow flex items-center gap-3">
+        <img src="weatherloop-logo.png" alt="Weather Loop logo" class="h-9 w-auto" onerror="this.style.display='none'"/>
+        <span>Weather Loop</span>
+      </h1>
+      <div class="flex items-center gap-2">
+        <button id="unitBtn" class="glass rounded-2xl px-3 py-2 text-sm">°F</button>
+        <button id="themeBtn" class="glass rounded-2xl px-3 py-2 text-sm">Theme</button>
+      </div>
+    </header>
+
+    <!-- search -->
+    <section class="mt-4">
+      <div class="glass rounded-3xl p-2">
+        <div class="flex items-center gap-2">
+          <input id="city" class="w-full bg-transparent outline-none placeholder-white/70 py-2" placeholder="Search city" />
+          <button id="useGps" class="glass rounded-2xl px-3 py-2">GPS</button>
+          <button id="go" class="bg-white text-gray-900 rounded-2xl px-4 py-2 font-medium">Search</button>
+        </div>
+      </div>
+      <p class="mt-2 text-white/80 text-sm">Try: Indianapolis, Chicago, New York</p>
+    </section>
+
+    <!-- current -->
+    <section class="mt-6 grid gap-4 md:grid-cols-3">
+      <div class="md:col-span-2 rounded-3xl glass p-6">
+        <div class="flex items-end justify-between">
+          <div>
+            <div id="place" class="text-xl sm:text-2xl font-medium">City</div>
+            <div id="dateNow" class="mt-1 text-white/80">Today</div>
+            <div class="mt-6 flex items-center gap-4">
+              <div id="temp" class="text-7xl sm:text-8xl leading-none">--°</div>
+              <div class="space-y-1">
+                <div id="summary" class="text-lg">Ready</div>
+                <div id="feels" class="text-white/80 text-sm">Feels like --°</div>
+                <div id="hiLo" class="text-white/80 text-sm">H --°  L --°</div>
+              </div>
+            </div>
+          </div>
+          <div id="bigIcon" class="text-7xl sm:text-8xl">☀️</div>
+        </div>
+      </div>
+      <div class="rounded-3xl glass p-6">
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+          <div><dt class="opacity-80">Wind</dt><dd class="text-lg">-- mph</dd></div>
+          <div><dt class="opacity-80">Humidity</dt><dd class="text-lg">--%</dd></div>
+          <div><dt class="opacity-80">Pressure</dt><dd class="text-lg">-- hPa</dd></div>
+          <div><dt class="opacity-80">Visibility</dt><dd class="text-lg">-- km</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- hourly -->
+    <section class="mt-6">
+      <h2 class="mb-3 text-lg font-medium">Today</h2>
+      <div class="hide-scroll overflow-x-auto whitespace-nowrap rounded-3xl glass p-3">
+        <div id="hourRow" class="flex gap-3">
+          <div class="w-20 shrink-0 rounded-2xl bg-white/10 text-center py-3">
+            <div class="text-sm opacity-90">--</div>
+            <div class="text-2xl">☁️</div>
+            <div class="mt-1 text-lg">--°</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- daily -->
+    <section class="mt-6">
+      <h2 class="mb-3 text-lg font-medium">Next days</h2>
+      <div id="daily" class="rounded-3xl glass">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+          <div class="w-32">Today</div>
+          <div class="text-2xl">⛅</div>
+          <div class="w-24 text-right">--°</div>
+          <div class="w-24 text-right opacity-80">--°</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- footer -->
+    <footer class="mt-10 pb-10 text-white/80 text-sm text-center">
+      Data by Open Meteo and Nominatim. <br /> 
+      IT488-01 | 2504B August 2025 Term - Purdue University Global - Team D - Weather App Project.
+    </footer>
+  </div>
+
+  <script>
+    const unitBtn = document.getElementById('unitBtn');
+    const themeBtn = document.getElementById('themeBtn');
+    let tempUnit = localStorage.getItem('unit') || 'fahrenheit';
+    unitBtn.textContent = tempUnit === 'fahrenheit' ? '°F' : '°C';
+
+    unitBtn.addEventListener('click', () => {
+      tempUnit = tempUnit === 'fahrenheit' ? 'celsius' : 'fahrenheit';
+      unitBtn.textContent = tempUnit === 'fahrenheit' ? '°F' : '°C';
+      localStorage.setItem('unit', tempUnit);
+    });
+
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-theme');
+      document.querySelectorAll('.glass').forEach(c => c.classList.toggle('glass-dark'));
+    });
+  </script>
+</body>
+</html>
