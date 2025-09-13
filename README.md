@@ -1,16 +1,14 @@
-# Weather Loop — Team D (Merged Front + Auth + Favorites)
-
-This package merges your teammate’s **index.html** UI with your PHP backend (auth, favorites, server‑side weather proxy) **without changing the original layout**. You only add controls/modals and hook JS.
+# Breezy — Team D (Merged Front + Auth + Favorites)
 
 ## Quick Start (XAMPP)
 
-1. Copy this folder into `C:\xampp\htdocs\weatherloop`.
-2. Rename `config.php.sample` → `config.php` and set DB + `OPENWEATHER_API_KEY`.
+1. Copy this folder into `C:\xampp\htdocs\Breezy`.
+2. In `config.php` and set DB + `OPENWEATHER_API_KEY`. or leave it
 3. Create database and tables:
    - Create DB `weatherloop` in phpMyAdmin
    - Import `sql/schema.sql`
 4. Start Apache + MySQL in XAMPP.
-5. Visit `http://localhost/weatherloop/index.php`
+5. Visit `http://localhost/Breezy/index.php`
 
 ## Files
 
@@ -27,11 +25,11 @@ This package merges your teammate’s **index.html** UI with your PHP backend (a
 - `php/favorites.php` — GET `?action=list` or POST JSON `{action:add/remove,...}`
 - `php/weather.php` — proxies to OpenWeather (keeps key private)
 - `sql/schema.sql` — MySQL tables
-- `config.php.sample` — copy to `config.php` and set credentials
+- `config.php` set credentials
 
 ## Swapping in the team’s assets
 
-- Keep your teammate’s `weatherloop-logo.png` and `weatherloop-favicon.png` in the web root.
+- Keep `weatherloop-logo.png` and `weatherloop-favicon.png` in the web root.
 - If their JS updates hourly/daily cards, **leave it**; our code updates only the “current” area and small metrics to avoid conflicts.
 - If they had `index.html`, just replace it with this `index.php` (or add this file alongside and use it).
 

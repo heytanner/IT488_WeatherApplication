@@ -6,7 +6,7 @@ session_start();
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Weather Loop</title>
+  <title>Breezy - Weather App</title>
   <link rel="icon" type="image/png" href="weatherloop-favicon.png" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -130,11 +130,11 @@ session_start();
   <div id="aboutModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center">
     <div class="bg-white text-black rounded-2xl max-w-lg w-full p-6">
       <div class="flex items-center justify-between">
-        <h3 class="font-semibold text-xl">About • Weather Loop (Team D)</h3>
+        <h3 class="font-semibold text-xl">About • Breezy (Team D)</h3>
         <button id="aboutClose" class="px-2 py-1 rounded hover:bg-black/10">✕</button>
       </div>
       <p class="mt-2 text-sm opacity-80">
-        Weather Loop lets anyone view forecasts. Signed-in users can save favorite locations.
+        Breezy lets anyone view forecasts. Signed-in users can save favorite locations.
       </p>
       <div id="teamList" class="mt-4 space-y-3"></div>
     </div>
@@ -212,6 +212,67 @@ session_start();
     const $ = s => document.querySelector(s);
     const $$ = s => Array.from(document.querySelectorAll(s));
 
+    function wmEmoji(code){
+      // Open-Meteo WMO weather codes -> emoji
+      if (code==0) return '☀️';
+      if ([1,2,3].includes(code)) return '⛅';
+      if ([45,48].includes(code)) return '🌫️';
+      if ([51,53,55,56,57].includes(code)) return '🌦️';
+      if ([61,63,65,80,81,82].includes(code)) return '🌧️';
+      if ([71,73,75,77,85,86].includes(code)) return '🌨️';
+      if ([95,96,99].includes(code)) return '⛈️';
+      return '☁️';
+    }
+
+    function fmtHourLabel(ts){ // '2025-04-20T15:00' -> '3 PM'
+      const d = new Date(ts);
+      let h = d.getHours();
+      const ampm = h>=12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return `${h} ${ampm}`;
+    }
+
+    function fmtDayLabel(iso){ // '2025-04-20' -> 'Sun' or 'Today'
+      const d = new Date(iso + 'T00:00:00');
+      const today = new Date();
+      const sameDay = d.toDateString() === today.toDateString();
+      return sameDay ? 'Today' : d.toLocaleDateString(undefined, { weekday:'short' });
+    }
+
+    function renderHourly(hours){
+      const row = document.getElementById('hourRow');
+      if (!row) return;
+      const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+      const fromNow = Date.now();
+      const todays = hours.filter(h => h.time.startsWith(today) && new Date(h.time).getTime() >= fromNow).slice(0,12);
+
+      if (!todays.length){
+        row.innerHTML = `<div class="w-20 shrink-0 rounded-2xl bg-white/10 text-center py-3 opacity-70">
+          <div class="text-sm">--</div><div class="text-2xl">☁️</div><div class="mt-1 text-lg">--°</div></div>`;
+        return;
+      }
+
+      row.innerHTML = todays.map(h => `
+        <div class="w-20 shrink-0 rounded-2xl bg-white/10 text-center py-3">
+          <div class="text-sm opacity-90">${fmtHourLabel(h.time)}</div>
+          <div class="text-2xl">${wmEmoji(h.code)}</div>
+          <div class="mt-1 text-lg">${Math.round(h.temp)}°</div>
+        </div>`).join('');
+    }
+
+    function renderDaily(days){
+      const box = document.getElementById('daily');
+      if (!box || !days.length) return;
+      box.innerHTML = days.slice(0,7).map(d => `
+        <div class="flex items-center justify-between px-5 py-4 border-b border-white/10 last:border-b-0">
+          <div class="w-32">${fmtDayLabel(d.date)}</div>
+          <div class="text-2xl">${wmEmoji(d.code)}</div>
+          <div class="w-24 text-right">${Math.round(d.tmax)}°</div>
+          <div class="w-24 text-right opacity-80">${Math.round(d.tmin)}°</div>
+        </div>`).join('');
+    }
+
+
     /* ---------- Existing buttons ---------- */
     const unitBtn = document.getElementById('unitBtn');
     const themeBtn = document.getElementById('themeBtn');
@@ -232,10 +293,10 @@ session_start();
 
     /* ---------- Added: About ---------- */
     const TEAM_D = [
-      { name: 'Sedjro “SGT Tovi” Tovihouande', role: 'Lead / Full-Stack' },
-      { name: 'Dale', role: 'Developer' },
-      { name: 'Samantha', role: 'QA / UX' },
-      { name: 'Vincent', role: 'Developer' },
+      { name: 'Evans, Rylie', role: 'Scrum Master, Developer' },
+      { name: 'Robests, Alisa', role: 'Full Stack Developer' },
+      { name: 'Smith, Tanner', role: 'Product Owner, Frontend Developer' },
+      { name: 'Tovihouande, Sedjro', role: 'Backend Developer' },
     ];
     function renderTeam(){
       const box = document.getElementById('teamList'); if (!box) return; box.innerHTML='';
@@ -366,13 +427,14 @@ session_start();
     async function fetchWeatherByCoords(lat, lon) {
       const key = `${lat},${lon},${WL.units}`;
       if (WL.cache.has(key)) return WL.cache.get(key);
-      const url = `php/weather.php?lat=${lat}&lon=${lon}&units=${WL.units}&include=current`;
+      const url = `php/weather.php?lat=${lat}&lon=${lon}&units=${WL.units}&include=current,hourly,daily`;
       const r = await fetch(url, {credentials:'same-origin'});
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || 'weather failed');
       WL.cache.set(key, j.data);
       return j.data;
     }
+
 
     function showCurrent(j){
       const c = j.current;
@@ -430,6 +492,15 @@ session_start();
       }
       const data = await fetchWeatherByCoords(lat, lon);
       showCurrent(data);
+      renderHourly(data.hourly || []);
+      renderDaily(data.daily || []);
+      // optional: set today's hi/lo if available
+      if ((data.daily || []).length) {
+        const d0 = data.daily[0];
+        document.getElementById('hiLo').textContent =
+          `H ${Math.round(d0.tmax)}°  L ${Math.round(d0.tmin)}°`;
+      }
+
     }
 
     document.getElementById('go').onclick = ()=>{
@@ -441,7 +512,15 @@ session_start();
       navigator.geolocation.getCurrentPosition(async pos => {
         const { latitude:lat, longitude:lon } = pos.coords;
         const data = await fetchWeatherByCoords(lat, lon);
-        showCurrent(data);
+      showCurrent(data);
+      renderHourly(data.hourly || []);
+      renderDaily(data.daily || []);
+      // optional: set today's hi/lo if available
+      if ((data.daily || []).length) {
+        const d0 = data.daily[0];
+        document.getElementById('hiLo').textContent =
+          `H ${Math.round(d0.tmax)}°  L ${Math.round(d0.tmin)}°`;
+      }
       }, () => alert('GPS error'));
     };
 
@@ -467,6 +546,14 @@ session_start();
           const lon = e.target.getAttribute('data-lon');
           const data = await fetchWeatherByCoords(lat, lon);
           showCurrent(data);
+          renderHourly(data.hourly || []);
+          renderDaily(data.daily || []);
+          // optional: set today's hi/lo if available
+          if ((data.daily || []).length) {
+            const d0 = data.daily[0];
+            document.getElementById('hiLo').textContent =
+              `H ${Math.round(d0.tmax)}°  L ${Math.round(d0.tmin)}°`;
+          }
         };
         row.querySelector('[data-remove]').onclick = async (e) => {
           const id = +e.target.getAttribute('data-remove');
