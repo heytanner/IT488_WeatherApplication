@@ -51,7 +51,7 @@ session_start();
           <button id="go" class="bg-white text-gray-900 rounded-2xl px-4 py-2 font-medium">Search</button>
         </div>
       </div>
-      <p class="mt-2 text-white/80 text-sm">Try: Indianapolis, Chicago, New York</p>
+      <p class="mt-2 text-white/80 text-sm">Try: Anchorage, Indianapolis, Chicago, or New York</p>
     </section>
 
     <!-- current -->
