@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Breezy Weather</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glass{background:rgba(255,255,255,.14);}
+    .glass-dark{background:rgba(0,0,0,.22);}
+    .text-shadow{ text-shadow: 0 2px 12px rgba(0,0,0,.45) }
+    .hide-scroll::-webkit-scrollbar{ display:none }
+    .hide-scroll{ -ms-overflow-style:none; scrollbar-width:none }
+  </style>
+</head>
+<body class="min-h-screen text-white font-sans selection:bg-white/20">
+  <!-- background -->
+  <div class="fixed inset-0 -z-10 bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700"></div>
+
+  <div class="mx-auto max-w-5xl px-4 py-6">
+    <!-- header -->
+    <header class="flex flex-col items-center gap-4">
+      <h1 class="text-4xl font-bold text-shadow text-center">Breezy</h1>
+
+      <div class="flex items-center gap-2">
+        <button id="unitBtn" class="glass hover:bg-white/25 active:scale-95 transition rounded-2xl px-3 py-2 text-sm">°F</button>
+        <button id="themeBtn" class="glass hover:bg-white/25 active:scale-95 transition rounded-2xl px-3 py-2 text-sm">Theme</button>
+        <a href="#about" class="glass hover:bg-white/25 rounded-2xl px-3 py-2 text-sm">About</a>
+      </div>
+    </header>
+
+    <!-- search -->
+    <section class="mt-4">
+      <div class="glass rounded-3xl p-2">
+        <div class="flex items-center gap-2">
+          <input id="city" class="w-full bg-transparent outline-none placeholder-white/70 py-2" placeholder="Search city" />
+          <button id="useGps" class="glass rounded-2xl px-3 py-2">GPS</button>
+          <button id="go" class="bg-white text-gray-900 rounded-2xl px-4 py-2 font-medium">Search</button>
+        </div>
+      </div>
+      <p class="mt-2 text-white/80 text-sm">Try: Indianapolis, Chicago, New York</p>
+    </section>
+
+    <!-- current -->
+    <section class="mt-6 grid gap-4 md:grid-cols-3">
+      <div class="md:col-span-2 rounded-3xl glass p-6">
+        <div class="flex items-end justify-between">
+          <div>
+            <div id="place" class="text-xl sm:text-2xl font-medium">City</div>
+            <div id="dateNow" class="mt-1 text-white/80">Today</div>
+            <div class="mt-6 flex items-center gap-4">
+              <div id="temp" class="text-7xl sm:text-8xl leading-none">--°</div>
+              <div class="space-y-1">
+                <div id="summary" class="text-lg">Ready</div>
+                <div id="feels" class="text-white/80 text-sm">Feels like --°</div>
+                <div id="hiLo" class="text-white/80 text-sm">H --°  L --°</div>
+              </div>
+            </div>
+          </div>
+          <div id="bigIcon" class="text-7xl sm:text-8xl">☀️</div>
+        </div>
+      </div>
+      <div class="rounded-3xl glass p-6">
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+          <div><dt class="opacity-80">Wind</dt><dd id="wind" class="text-lg">-- mph</dd></div>
+          <div><dt class="opacity-80">Humidity</dt><dd id="humidity" class="text-lg">--%</dd></div>
+          <div><dt class="opacity-80">Pressure</dt><dd id="pressure" class="text-lg">-- hPa</dd></div>
+          <div><dt class="opacity-80">Visibility</dt><dd id="visibility" class="text-lg">-- km</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- hourly -->
+    <section class="mt-6">
+      <h2 class="mb-3 text-lg font-medium">Today</h2>
+      <div class="hide-scroll overflow-x-auto whitespace-nowrap rounded-3xl glass p-3">
+        <div id="hourRow" class="flex gap-3">
+          <div class="w-20 shrink-0 rounded-2xl bg-white/10 text-center py-3">
+            <div class="text-sm opacity-90">--</div>
+            <div class="text-2xl">☁️</div>
+            <div class="mt-1 text-lg">--°</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- daily -->
+    <section class="mt-6">
+      <h2 class="mb-3 text-lg font-medium">Next days</h2>
+      <div id="daily" class="rounded-3xl glass">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+          <div class="w-32">Today</div>
+          <div class="text-2xl">⛅</div>
+          <div class="w-24 text-right">--°</div>
+          <div class="w-24 text-right opacity-80">--°</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- radar -->
+    <section class="mt-6">
+      <h2 class="mb-3 text-lg font-medium">Map</h2>
+      <div class="rounded-3xl glass overflow-hidden">
+        <iframe id="radar"
+          title="Radar"
+          class="w-full"
+          style="height: 28rem; border: 0;"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          src="">
+        </iframe>
+      </div>
+    </section>
+
+    <!-- footer -->
+    <footer class="mt-10 pb-10 text-white/80 text-sm text-center">
+      Data by Open-Meteo & Windy.com <br /> 
+      IT488-01 | 2504B August 2025 Term - Purdue University Global - Team D - Weather App Project.
+    </footer>
+  </div>
+
+  <script>
+    const unitBtn = document.getElementById('unitBtn');
+    const themeBtn = document.getElementById('themeBtn');
+    const goBtn = document.getElementById('go');
+    const gpsBtn = document.getElementById('useGps');
+    const cityEl = document.getElementById('city');
+
+    // UI fields
+    const place = document.getElementById('place');
+    const dateNow = document.getElementById('dateNow');
+    const temp = document.getElementById('temp');
+    const summary = document.getElementById('summary');
+    const feels = document.getElementById('feels');
+    const hiLo = document.getElementById('hiLo');
+    const wind = document.getElementById('wind');
+    const humidity = document.getElementById('humidity');
+    const pressure = document.getElementById('pressure');
+    const visibility = document.getElementById('visibility');
+
+    let tempUnit = localStorage.getItem('unit') || 'fahrenheit';
+    unitBtn.textContent = tempUnit === 'fahrenheit' ? '°F' : '°C';
+
+    // Toggle units
+    unitBtn.addEventListener('click', () => {
+      tempUnit = tempUnit === 'fahrenheit' ? 'celsius' : 'fahrenheit';
+      unitBtn.textContent = tempUnit === 'fahrenheit' ? '°F' : '°C';
+      localStorage.setItem('unit', tempUnit);
+    });
+
+    // Toggle theme
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-theme');
+      document.querySelectorAll('.glass').forEach(c => c.classList.toggle('glass-dark'));
+    });
+
+    // Radar update
+    function updateRadar(lat, lon){
+      const frame = document.getElementById('radar');
+      if(!frame) return;
+      frame.src = `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&zoom=7&level=surface&overlay=radar`;
+    }
+
+    // Weather fetch
+    async function goWeather(lat, lon, placeName="Selected Location"){
+      try {
+        const res = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+          `&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m,pressure_msl,visibility` +
+          `&daily=temperature_2m_max,temperature_2m_min,weather_code` +
+          `&timezone=auto&temperature_unit=${tempUnit}`
+        );
+        const data = await res.json();
+
+        // Update UI
+        place.textContent = placeName;
+        dateNow.textContent = new Date().toLocaleString([], {weekday:'long', hour:'2-digit', minute:'2-digit'});
+        temp.textContent = data.current.temperature_2m + "°";
+        feels.textContent = "Feels like " + data.current.apparent_temperature + "°";
+        hiLo.textContent = "H " + data.daily.temperature_2m_max[0] + "°  L " + data.daily.temperature_2m_min[0] + "°";
+        summary.textContent = "Updated";
+
+        wind.textContent = data.current.wind_speed_10m + " mph";
+        humidity.textContent = data.current.relative_humidity_2m + "%";
+        pressure.textContent = data.current.pressure_msl + " hPa";
+        visibility.textContent = data.current.visibility + " m";
+
+        // Radar
+        updateRadar(lat, lon);
+      } catch(err){
+        console.error("Weather fetch failed", err);
+        alert("Could not get weather data.");
+      }
+    }
+
+    // Search handler
+    goBtn.addEventListener('click', async () => {
+      if(!cityEl.value) return;
+      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cityEl.value}&count=1`);
+      const geoData = await geoRes.json();
+      if(geoData.results && geoData.results.length > 0){
+        const loc = geoData.results[0];
+        goWeather(loc.latitude, loc.longitude, loc.name);
+      } else {
+        alert("City not found");
+      }
+    });
+
+    // GPS handler
+    gpsBtn.addEventListener('click', () => {
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(pos => {
+          goWeather(pos.coords.latitude, pos.coords.longitude, "Current Location");
+        }, () => alert("Could not get location"));
+      }
+    });
+  </script>
+</body>
+</html>
