@@ -3,8 +3,6 @@ Team D – Purdue Global (IT488-01, 2504B).
 
 **Highlights**: City search, GPS fetch, Open-Meteo, radar embed, login modal, favorites (localStorage).
 
-# Breezy — IT488 Weather Application
-
 A sprint-driven, front-end weather app for Purdue Global IT488 (Team D). Breezy provides current conditions, a radar view, and progressive enhancements (login, favorites, compass) using the Open-Meteo API and an embedded Windy radar.
 
 ---
