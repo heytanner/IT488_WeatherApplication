@@ -46,11 +46,11 @@ Ensure Breezy Weather meets acceptance criteria and operates without critical de
 |:--:|:--|:--|:--|:--|
 | TC-01 | Login Persistence | Sedjro | Session remains active post-login | ✅ Passed |
 | TC-02 | Favorites Add/Remove | Sedjro | Adds/removes cities correctly | ✅ Passed |
-| TC-03 | Weather Alerts | Sedjro | Displays alerts dynamically | ✅ Passed |
+| TC-03 | Weather Alerts | Alisa | Displays alerts dynamically | ✅ Passed |
 | TC-04 | Compass Alignment | Rylie | Points to accurate wind direction | ✅ Passed |
 | TC-05 | Responsive Layout | Rylie | Adapts to mobile and tablet screens | ✅ Passed |
 | TC-06 | Offline Mode | Tanner | Cached version loads when offline | ✅ Passed |
-| TC-07 | API Error Handling | Tanner | Shows “Network Error – Try Again” | ✅ Passed |
+| TC-07 | API Error Handling | Alisa | Shows “Network Error – Try Again” | ✅ Passed |
 
 **Summary:**  
 All **7 test cases passed** across browsers (Chrome, Edge, Firefox, Safari).  
