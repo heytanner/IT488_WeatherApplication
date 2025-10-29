@@ -1,5 +1,5 @@
 # Breezy Weather — Team D
-Purdue Global (IT488-01, 2504B).
+Purdue Global (IT488-01, 2504B) .
 
 Simple, fast weather PWA with install support.
 
